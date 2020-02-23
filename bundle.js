@@ -1,11 +1,14 @@
-"use strict";
+'use strict';
 
-var _mkGuide = require("mk-guide");
+var _mkGuide = require('mk-guide');
 
 var _mkGuide2 = _interopRequireDefault(_mkGuide);
 
+require('mk-guide/style.css');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// import MaskGuide from './node_modules/mk-guide/src/MaskClass.js'
 var mask = new _mkGuide2.default({
     // buttonColor: '#348b86',
     // skipButtonColor: 'black'

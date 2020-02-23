@@ -1,4 +1,6 @@
-import MaskGuide from 'mk-guide'
+import MaskGuide from './node_modules/mk-guide/src/MaskClass.js'
+// import MaskGuide from 'mk-guide'
+// import 'mk-guide/style.css'
 
 let mask = new MaskGuide({
     // buttonColor: '#348b86',
