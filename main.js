@@ -1,4 +1,4 @@
-import MaskGuide from './node_modules/mk-guide/src/MaskClass.js'
+import MaskGuide from './MaskClass-src.js'
 // import MaskGuide from 'mk-guide'
 // import 'mk-guide/style.css'
 
