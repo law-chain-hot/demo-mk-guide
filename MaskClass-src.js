@@ -1,9 +1,25 @@
+const throttle = function (fn, delay) {
+    let timer = null
+    return function () {
+        const context = this
+        let args = arguments
+        if (!timer) {
+            timer = setTimeout(() => {
+                fn.apply(context, args)
+                clearTimeout(timer)
+                timer = null;
+            }, delay)
+        }
+    }
+}
+
+
 class MaskGuide {
     constructor(option = {}) {
         this.options = {
             // buttonColor: 'black',
             // skipButtonColor: 'firebrick',
-
+            mouseHover: 'true',
             ...option,
         };
 
@@ -15,10 +31,10 @@ class MaskGuide {
 
         // 2. guides
         this.guides = null
+        this.intro = false
 
-        // 3. start
-        // call start()
-
+        // 3. online the mask node
+        // this.maskNode.style.display = 'block';
     }
 
     initValues() {
@@ -40,6 +56,8 @@ class MaskGuide {
         this.maskNode = document.createElement('div');
         this.maskNode.className = 'mask';
         this.docNode.insertAdjacentElement("beforeend", this.maskNode);
+        // offline the mask node
+        this.maskNode.style.display = 'none';
 
         // mask-tip
         this.maskTipNode = document.createElement('div');
@@ -50,6 +68,17 @@ class MaskGuide {
         this.maskDesNode = document.createElement('div');
         this.maskDesNode.className = 'mask-des';
         this.maskTipNode.insertAdjacentElement("afterbegin", this.maskDesNode)
+
+        // mask-header
+        this.maskHeaderNode = document.createElement('h1');
+        this.maskHeaderNode.className = 'mask-header';
+        this.maskTipNode.insertAdjacentElement("afterbegin", this.maskHeaderNode)
+
+        // mask-pic
+        this.maskPicNode = document.createElement('img');
+        this.maskPicNode.className = 'mask-img-0230';
+        this.maskPicNode.style.display = 'none';
+        this.maskTipNode.insertAdjacentElement("afterbegin", this.maskPicNode)
 
         // mask-button-group
         this.maskBtnGroupNode = document.createElement('div');
@@ -67,8 +96,6 @@ class MaskGuide {
         this.maskBtnBeforeNode.className = 'mask-btn-before';
         this.maskBtnGroupNode.insertAdjacentElement("beforeend", this.maskBtnBeforeNode)
 
-
-
         // mask-button-next
         this.maskBtnNextNode = document.createElement('button');
         this.maskBtnNextNode.className = 'mask-btn-next';
@@ -80,18 +107,16 @@ class MaskGuide {
 
 
     initCSS() {
-        this.maskBtnGroupNode.style.display = "flex"
 
+
+        // this.maskBtnGroupNode.style.display = "flex"
+        this.maskBtnGroupNode.width = "270px"
 
         // button color
-        // if (this.options.skipButtonColor && this.options.buttonColor){
-        //     this.options.skipButtonColor = "firebrick"
-        // }
-        if ( !this.options.buttonColor) {
+        if (!this.options.buttonColor) {
             this.options.buttonColor = "black"
-            if ( !this.options.skipButtonColor) this.options.skipButtonColor = "firebrick"
+            if (!this.options.skipButtonColor) this.options.skipButtonColor = "firebrick"
         }
-
 
         this.maskBtnNextNode.style.borderColor = this.options.buttonColor;
         this.maskBtnBeforeNode.style.borderColor = this.options.buttonColor;
@@ -101,19 +126,14 @@ class MaskGuide {
         if (this.options.skipButtonColor) this.skipButtonColor = this.options.skipButtonColor;
         this.maskBtnSkipNode.style.borderColor = this.skipButtonColor;
 
-
-        //
         this.maskBtnSkipNode.style.position = "relative";
         this.maskBtnSkipNode.style.right = "22px";
 
-
-
-
-        this.initMouseEvent(this.maskBtnNextNode, this.options.buttonColor);
-        this.initMouseEvent(this.maskBtnBeforeNode, this.options.buttonColor);
-        this.initMouseEvent(this.maskBtnSkipNode, this.skipButtonColor);
-
-
+        if (this.options.mouseHover !== "false") {
+            this.initMouseEvent(this.maskBtnNextNode, this.options.buttonColor);
+            this.initMouseEvent(this.maskBtnBeforeNode, this.options.buttonColor);
+            this.initMouseEvent(this.maskBtnSkipNode, this.skipButtonColor);
+        }
     }
 
     initMouseEvent(el, color) {
@@ -132,10 +152,10 @@ class MaskGuide {
         // 1. get the value of element
         this.offsetWidth = el.offsetWidth;
         this.offsetHeight = el.offsetHeight;
-        this.getAbsoluteLeft = el.getBoundingClientRect().left + document.documentElement.scrollLeft;
-        this.getAbsoluteTop = el.getBoundingClientRect().top + document.documentElement.scrollTop;
-        this.getAbsoluteRight = el.getBoundingClientRect().right + document.documentElement.scrollRight;
-        this.getAbsoluteBottom = el.getBoundingClientRect().bottom + document.documentElement.scrollBottom;
+        this.getAbsoluteLeft = el.getBoundingClientRect().left + (document.documentElement.scrollLeft || 0);
+        this.getAbsoluteTop = el.getBoundingClientRect().top + (document.documentElement.scrollTop || 0);
+        this.getAbsoluteRight = el.getBoundingClientRect().right + (document.documentElement.scrollRight || 0);
+        this.getAbsoluteBottom = el.getBoundingClientRect().bottom + (document.documentElement.scrollBottom || 0);
 
         // 2. get the value of screen
         this.screenWidth = this.docNode.scrollWidth;
@@ -145,7 +165,6 @@ class MaskGuide {
         this.maskNode.style.boxSizing = "border-box";
         this.maskNode.style.zIndex = "900";
 
-
         // 3.2 screen
         this.maskNode.style.width = this.screenWidth + "px";
         this.maskNode.style.height = this.screenHeight + "px";
@@ -153,13 +172,12 @@ class MaskGuide {
         // 3.3 border
         this.maskNode.style.borderLeft = this.getAbsoluteLeft - 10 + "px";
         this.maskNode.style.borderTop = this.getAbsoluteTop - 10 + "px";
-        this.maskNode.style.borderRight = this.screenWidth - this.offsetWidth - this.getAbsoluteLeft - 10 + "px";
-        this.maskNode.style.borderBottom = this.screenHeight - this.offsetHeight - this.getAbsoluteTop - 10 + "px";
-
+        this.maskNode.style.borderBottom = this.screenHeight - this.offsetHeight - this.getAbsoluteTop - 10 + "px" + " solid";
+        this.maskNode.style.borderRight = (this.screenWidth - this.offsetWidth - this.getAbsoluteLeft - 10 > 0 ? this.screenWidth - this.offsetWidth - this.getAbsoluteLeft - 10 : 0) + "px" + " solid";
         this.maskNode.style.borderColor = "rgba(0, 0, 0, 0.5)";
         this.maskNode.style.borderStyle = 'solid';
-        this.maskNode.style.backgroundColor = "rgba(225, 225, 225, 0.1)";
 
+        this.maskNode.style.backgroundColor = "rgba(225, 225, 225, 0.1)";
         this.maskNode.style.position = "absolute";
         this.maskNode.style.left = 0;
         this.maskNode.style.top = 0;
@@ -170,25 +188,137 @@ class MaskGuide {
 
     setMaskTip() {
         this.maskTipNode.style.position = "absolute";
-        this.maskTipNode.style.left = 10 + "px";
-        this.maskTipNode.style.top = this.offsetHeight + 35 + "px";
+        this.maskTipNode.style.display = "flex";
+        this.maskTipNode.style.flexDirection = "column";
+        this.maskTipNode.style.alignItems = "center";
 
-        this.maskTipNode.style.width = "270px";
-        // this.maskTipNode.style.minHeight = "120px";
+        this.maskTipNode.style.top = this.offsetHeight + 35 + "px";
+        let diff = this.getAbsoluteRight + 30
+
+        if (diff > document.documentElement.clientWidth) {
+            let move = diff - document.documentElement.clientWidth + 50
+            this.maskTipNode.style.left = '-390px'
+        } else {
+            this.maskTipNode.style.left = "0px";
+        }
+
         this.maskTipNode.style.backgroundColor = "white"
         this.maskTipNode.style.borderRadius = "3px"
-        this.maskTipNode.style.padding = "5px"
+        this.maskTipNode.style.padding = "15px"
+        this.maskTipNode.style.minWidth = "390px"
+        this.maskTipNode.style.maxWidth = "400px"
+        this.maskTipNode.style.boxShadow = "rgba(0, 0, 0, 0.36) 1px 2px 13px 2px"
+    }
+
+    setIntro() {
+        // 1. get the value of screen
+        this.screenWidth = this.docNode.scrollWidth;
+        this.screenHeight = this.docNode.scrollHeight;
+
+        // 1. get the value of screen
+        this.clientWidth = this.docNode.clientWidth;
+        this.clientHeight = this.docNode.clientHeight;
+
+        // 2.1 set mask
+        this.maskNode.style.boxSizing = "border-box";
+        this.maskNode.style.zIndex = "900";
+
+        // 2.2 screen
+        this.maskNode.style.width = this.screenWidth + "px";
+        this.maskNode.style.height = this.screenHeight + "px";
+
+
+
+        this.maskNode.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+        this.maskNode.style.position = "absolute";
+        this.maskNode.style.left = 0;
+        this.maskNode.style.top = 0;
+
+
+        // setMaskTip() for intro
+        this.maskTipNode.style.position = "absolute";
+        this.maskTipNode.style.display = "flex";
+        this.maskTipNode.style.flexDirection = "column";
+        this.maskTipNode.style.alignItems = "center";
+
+        this.maskTipNode.style.top = this.clientHeight / 6 + "px";
+        this.maskTipNode.style.left = this.clientWidth / 7 * 2 + "px";
+
+
+
+        this.maskTipNode.style.backgroundColor = "white"
+        this.maskTipNode.style.borderRadius = "3px"
+        this.maskTipNode.style.padding = "15px"
+        this.maskTipNode.style.width = "40%"
+        this.maskTipNode.style.boxShadow = "rgba(0, 0, 0, 0.36) 1px 2px 13px 2px"
+
     }
 
     setMaskDesNode(des) {
+        this.maskDesNode.width = "80%"
         this.maskDesNode.innerHTML = des
+        this.maskDesNode.style.wordWrap = "break-word"
+        this.maskDesNode.style.textAlign = "center"
     }
 
+    setMaskHeaderNode(header) {
+        if (header) {
+            this.maskHeaderNode.width = "80%"
+            this.maskHeaderNode.innerHTML = header || null
+            this.maskHeaderNode.style.wordWrap = "break-word"
+            this.maskHeaderNode.style.padding = '10px'
+        } else {
+            this.maskHeaderNode.style.padding = '0px'
+        }
+    }
+
+    setMaskPicNode(imgURL) {
+        if (imgURL) {
+            // header 
+            this.maskPicNode.style.padding = '10px'
+            this.maskPicNode.src = imgURL
+            this.maskPicNode.style.display = 'block'
+            // this.maskPicNode.style.width = '100%'
+            if (this.count == 0 && this.intro == false && this.guides[0].intro) {
+                this.maskPicNode.style.maxWidth = '99%'
+            } else {
+                this.maskPicNode.style.maxWidth = '370px'
+            }
+
+        } else {
+            this.maskPicNode.style.padding = '0px'
+            this.maskPicNode.style.display = 'none'
+        }
+
+    }
 
     setMaskBtnNode() {
 
+        let refreshMask = throttle(() => {
+            if (this.count == 0 && this.guides[0].intro){
+                this.introStart()
+            }
+            if (this.count > 0){
+                this.maskStart(this.guides[this.count])
+            }
+        }, 500)
+
+        let refreshMaskWithContext = refreshMask.bind(this);
+
+        // add event resize
+        window.addEventListener('resize', refreshMaskWithContext);
+
+        let clearEvent = () => {
+            remove()
+            document.removeEventListener('keydown', keyEvent);
+            document.removeEventListener('resize', refreshMask);
+        }
+
+
         this.maskBtnSkipNode.innerHTML = 'Skip'
         this.skip = (e) => {
+            // document.removeEventListener('keydown', keyEvent);
+            clearEvent()
             this.maskNode.style.display = "none";
         }
         this.maskBtnSkipNode.onclick = this.skip;
@@ -196,22 +326,28 @@ class MaskGuide {
         // next btn
         this.maskBtnNextNode.innerHTML = 'Next→'
         this.next = (e) => {
-            // clear focus
-            document.querySelector(this.guides[this.count].element).blur()
+            this.intro = true;
+            if (this.guides[this.count].element) {
+                // clear focus
+                document.querySelector(this.guides[this.count].element).blur()
+            }
+
             // console.log(document.body.focus());
-            
             this.count++
             if (this.guides[this.count]) {
                 this.maskBtnNextNode.innerHTML = 'Next→'
                 this.maskBtnBeforeNode.style.visibility = "visible"
+                if (this.intro == true && this.count == 1) {
+                    this.maskBtnBeforeNode.style.visibility = "hidden"
+                }
                 this.maskStart(this.guides[this.count])
                 if (this.count === this.guides.length - 1) this.maskBtnNextNode.innerHTML = 'Done'
             } else {
+                clearEvent()
                 this.maskNode.style.display = "none";
             }
         }
         this.maskBtnNextNode.onclick = this.next
-
 
         // before btn
         this.maskBtnBeforeNode.style.visibility = "hidden"
@@ -219,10 +355,15 @@ class MaskGuide {
         this.before = (e) => {
             // clear focus
             document.querySelector(this.guides[this.count].element).blur()
-
-            this.count--
+            if (this.intro == true) {
+                if (this.count > 1) {
+                    this.count--
+                }
+            } else {
+                this.count--
+            }
             this.maskBtnNextNode.innerHTML = 'Next→'
-            if (this.count === 0) {
+            if (this.count === 0 || (this.intro == true && this.count == 1)) {
                 this.maskBtnBeforeNode.style.visibility = "hidden"
                 this.maskStart(this.guides[this.count])
             } else if (this.count > 0) {
@@ -233,9 +374,8 @@ class MaskGuide {
         }
         this.maskBtnBeforeNode.onclick = this.before;
 
-
         // keypress
-        document.addEventListener('keydown', (e) => { //event is what we tap in the keyboard
+        let keyEvent = (e) => { //event is what we tap in the keyboard
             if (event.keyCode === 37 || event.which === 37) {
                 this.before();
             }
@@ -245,27 +385,52 @@ class MaskGuide {
             if (event.keyCode === 27 || event.which === 27) {
                 this.skip();
             }
-        });
+        }
+        document.addEventListener('keydown', keyEvent);
+
+        let remove = () => {
+            // var elem = document.querySelector('.mask-0230');
+            this.maskNode.parentNode.removeChild(this.maskNode);
+        }
     }
 
-
     maskStart(guide) {
-        let ele = document.querySelector(guide.element)
-        if (guide.shouldFocus) {
-            ele.focus();
+
+        if (guide) {
+            this.maskTipNode.style.display = 'none';
+            let ele = document.querySelector(guide.element)
+            if (guide.shouldFocus) {
+                ele.focus();
+            }
+            this.setMask(ele)
+            this.setMaskTip()
+            this.setMaskDesNode(guide.description)
+            this.setMaskHeaderNode(guide.header)
+            this.setMaskPicNode(guide.imgURL)
         }
-        this.setMask(ele)
-        this.setMaskTip()
-        this.setMaskDesNode(guide.description)
+
     }
 
     start() {
-        if (this.guides) {
+        this.maskNode.style.display = 'block';
+        if (this.guides[0].intro) {
+            this.introStart()
+        } else if (this.guides) {
             this.maskStart(this.guides[this.count])
         }
     }
 
+    introStart() {
+        this.setIntro()
+        // this.setMaskTip()
+        this.setMaskDesNode(this.guides[0].description)
+        this.setMaskHeaderNode(this.guides[0].header)
+        this.setMaskPicNode(this.guides[0].imgURL)
+    }
+
 }
+
+
 
 // export default MaskGuide
 
@@ -273,26 +438,51 @@ class MaskGuide {
 let mask = new MaskGuide({
     // buttonColor: '#348b86',
     // skipButtonColor: 'black'
+    mouseHover: 'false'
 })
+
 
 mask.guides = [
     {
+        // shouldFocus: true,
+        intro: true,
+        imgURL: 'https://admissions.illinois.edu/Content/images/photo-tour/quad_main.jpg',
+        header: 'Welcome',
+        description: "Now, there is description"
+    },
+    {
+        element: ".test_absolute",
+        imgURL: "https://sitechecker.pro/wp-content/uploads/2017/12/URL-meaning.png",
+        header: 'test',
+        description: "Step1: You can control with <br> '→ ← ESC' ",
+
+        // <br> <br>第一步：你可以通过 '→ ← ESC' 这三个键来控制
+
+    },
+    {
         element: ".budget__title",
-        description: "Step1: You can control with <br> '→ ← ESC' <br> <br>第一步：你可以通过 '→ ← ESC' 这三个键来控制"
+        imgURL: '',
+        header: 'Now, I am Header',
+        description: "Step1: You can control with "
+        // <br> '→ ← ESC' <br> <br>第一步：你可以通过 '→ ← ESC' 这三个键来控制
     },
     {
         element: ".budget__income.clearfix",
-        description: "Step2: This is income part <br> <br> 第二步：这是收入部分"
+        header: 'Now, no pic no one is better than me',
+        description: "Step2: This is income part "
+        // <br> <br> 第二步：这是收入部分
     },
     {
         shouldFocus: true,
         element: ".add__description",
-        description: "Step3: Tap in here, and focus it (shouldFocus: true)<br> <br> 第三步：在此处输入，已focus此元素 (shouldFocus: true)"
+        imgURL: 'https://admissions.illinois.edu/Content/images/photo-tour/quad_main.jpg',
+        description: "Now, no header"
     },
     {
         element: ".budget",
         description: "Step4: That's all, click 'Done'<br> <br> 第四步：结束，请按‘Done’"
     },
+
 ]
 
 mask.start()
