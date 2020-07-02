@@ -35,7 +35,11 @@
   color: black;
   /* border: 2px solid #348b86; */
   border: 2px solid;
+}
 
+
+.mask .mask-tip button:focus {
+  border: 3.5px solid #3261fc !important;
 }
 
 /* .mask .mask-tip button:hover { */
@@ -45,4 +49,16 @@
 
 .mask-tip h1{
   font-size: 20px;
+}
+
+.fix{
+  width: 200px;
+  height: 300px;
+  background-color: chocolate;
+  position: fixed;
+  z-index: 200;
+  left: 120px;
+  top: 120px;
+  color: white;
+  padding: 20px
 }
