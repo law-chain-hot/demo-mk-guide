@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/law-chain-hot/demo-mk-guide#readme",
   "dependencies": {
-    "mk-guide": "^1.0.5",
+    "mk-guide": "^1.11.1",
     "npm": "^6.13.7",
     "webpack": "^4.41.6"
   },

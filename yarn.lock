@@ -2831,10 +2831,10 @@ mixin-deep@^1.2.0:
     for-in "^1.0.2"
     is-extendable "^1.0.1"
 
-mk-guide@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/mk-guide/-/mk-guide-1.0.5.tgz#e56375508544055aac2e8e7c09eac52bbf0d6325"
-  integrity sha512-5Q5BpJaRvgPq/airZyl8fvDjv6jfy1klpX9KFeZv8z8V4bVioKnZdfYNBOgpTkKElVv4soMPewu5I4KPLnKi8w==
+mk-guide@^1.11.1:
+  version "1.11.1"
+  resolved "https://registry.yarnpkg.com/mk-guide/-/mk-guide-1.11.1.tgz#5136b04020c32391cdb794f9b58d1b2e923f0a99"
+  integrity sha512-ujY9uZUwa2dL9Cj5urLESvROGj8bz0vtutcOPDaBVUQN1bAaHU77J912TbOWKdUkCFTGdUZWf8eGWNsNXJZyYA==
 
 mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkdirp@~0.5.1:
   version "0.5.1"
