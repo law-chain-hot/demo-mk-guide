@@ -18,6 +18,8 @@ class MaskGuide {
             // buttonColor: 'black',
             // skipButtonColor: 'firebrick',
             mouseHover: 'true',
+            isKeyboard: false,
+            isFocus: 'true',
             ...option,
         };
 
@@ -342,7 +344,7 @@ class MaskGuide {
     setMaskBtnNode() {
 
         let refreshMask = throttle(() => {
-            console.log('resize');
+            // console.log('resize');
             
             if (this.count == 0 && this.guides[0].intro) {
                 this.introStart()
@@ -361,7 +363,7 @@ class MaskGuide {
 
         let clearEvent = () => {
             remove()
-            // document.removeEventListener('keydown', keyEventMKGuide);
+            document.removeEventListener('keydown', keyEventMKGuide);
             window.removeEventListener('resize', refreshMask);
             window.addEventListener('scroll', refreshMask);
 
@@ -379,7 +381,7 @@ class MaskGuide {
         // next btn
         this.maskBtnNextNode.innerHTML = 'Next→'
         this.next = (e) => {
-            this.maskBtnNextNode.focus()
+            this.options.isFocus && this.maskBtnNextNode.focus()
             if (this.guides[0].intro) this.intro = true;
             // if (this.guides[this.count].element) {
             //     // clear focus
@@ -440,7 +442,9 @@ class MaskGuide {
                 this.skip();
             }
         }
-        // document.addEventListener('keydown', keyEventMKGuide);
+
+        if(this.options.isKeyboard) 
+            document.addEventListener('keydown', keyEventMKGuide);
 
         let remove = () => {
             // var elem = document.querySelector('.mask-0230');
@@ -449,7 +453,7 @@ class MaskGuide {
     }
 
     maskStart(guide) {
-        console.log("maskStart -> guide.element", guide.element)
+        // console.log("maskStart -> guide.element", guide.element)
         if (guide.element !== 'undefined') {
             // console.log("=========")
             this.maskTipNode.style.display = 'none';
@@ -457,7 +461,7 @@ class MaskGuide {
             // if (guide.shouldFocus) {
             //     ele.focus();
             // }
-            console.dir(ele)
+            // console.dir(ele)
             this.setMask(ele)
             this.setMaskTip()
             this.setMaskDesNode(guide.description)
@@ -487,7 +491,7 @@ class MaskGuide {
         } else if (this.guides) {
             this.maskStart(this.guides[this.count])
         }
-        this.maskBtnNextNode.focus()
+        this.options.isFocus && this.maskBtnNextNode.focus()
 
     }
 
@@ -498,7 +502,7 @@ class MaskGuide {
         this.setMaskDesNode(this.guides[0].description)
         this.setMaskHeaderNode(this.guides[0].header)
         this.setMaskPicNode(this.guides[0].imgURL)
-        this.maskBtnNextNode.focus()
+        this.options.isFocus && this.maskBtnNextNode.focus()
 
     }
 }
@@ -510,7 +514,8 @@ let mask = new MaskGuide({
     // buttonColor: '#348b86',
     // skipButtonColor: 'black'
     mouseHover: 'false',
-    mode: 'dark'
+    mode: 'dark',
+    // isFocus: false
 })
 
 
