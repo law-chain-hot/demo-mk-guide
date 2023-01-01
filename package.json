@@ -19,9 +19,9 @@
   "dependencies": {
     "mk-guide": "^1.11.1",
     "npm": "^6.13.7",
-    "webpack": "^4.41.6"
+    "webpack": "^5.75.0"
   },
   "devDependencies": {
-    "webpack-cli": "^3.3.11"
+    "webpack-cli": "^5.0.1"
   }
 }
